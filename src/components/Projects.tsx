@@ -84,10 +84,9 @@ export function Projects({
                 className="project-button"
                 type="button"
                 data-project={project.id}
-                aria-label={project.accessibleLabel}
                 onClick={() => onOpen(project.id)}
               >
-                Open the experiment <span>↗</span>
+                {project.accessibleLabel} <span aria-hidden="true">↗</span>
               </button>
               <span
                 className={`project-status mono${visited.includes(project.id) ? " seen" : ""}`}
