@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="robots" content="noindex, follow" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Motion desk — Harshit</title>
+    <link rel="icon" href="data:," />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #242720;
+        color: #f3f1e9;
+        font:
+          13px ui-monospace,
+          monospace;
+      }
+      header {
+        padding: 25px 4%;
+        border-bottom: 1px solid #555b4c;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      h1 {
+        font: 500 24px system-ui;
+        margin: 0;
+      }
+      main {
+        padding: 30px 4%;
+      }
+      p {
+        color: #b7bba9;
+        line-height: 1.7;
+        max-width: 780px;
+      }
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin: 25px 0;
+      }
+      button {
+        background: #f3f1e9;
+        color: #242720;
+        border: 0;
+        padding: 12px 17px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: wait;
+      }
+      input {
+        flex: 1;
+        min-width: 180px;
+        accent-color: #ef4c2a;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      a:focus-visible {
+        outline: 3px solid #ef4c2a;
+        outline-offset: 4px;
+      }
+      .pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .frame-label {
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .viewport {
+        height: 490px;
+        position: relative;
+        overflow: hidden;
+        background: #f3f1e9;
+      }
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1440px;
+        height: 1020px;
+        border: 0;
+        transform-origin: 0 0;
+      }
+      output {
+        min-width: 65px;
+      }
+      footer {
+        margin-top: 20px;
+        font-size: 11px;
+        color: #b7bba9;
+      }
+      #status {
+        color: #f5a178;
+      }
+      @media (max-width: 800px) {
+        .pair {
+          grid-template-columns: 1fr;
+        }
+        .viewport {
+          height: 400px;
+        }
+        header {
+          gap: 15px;
+        }
+        h1 {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>The motion desk.</h1>
+      <a href="index.html">Back to portfolio ↗</a>
+    </header>
+    <main>
+      <p>
+        An original motion study, not a video reconstruction. Compare a pinned
+        reference moment with any frame of the 12-second loop. Both views use
+        the same SVG and GSAP clock.
+      </p>
+      <div class="controls">
+        <button id="pin" disabled>Pin current frame</button
+        ><button id="previous" disabled aria-label="Previous frame">
+          ← 1 frame</button
+        ><input
+          id="scrub"
+          type="range"
+          min="0"
+          max="12"
+          step="any"
+          value="6"
+          aria-label="Comparison time"
+        /><button id="next" disabled aria-label="Next frame">1 frame →</button
+        ><output id="time">06.00 s</output
+        ><button id="seam" disabled>Check loop seam</button>
+      </div>
+      <div class="pair">
+        <section>
+          <div class="frame-label">
+            <span>REFERENCE FRAME</span><span id="reference-time">0.00 s</span>
+          </div>
+          <div class="viewport">
+            <iframe
+              id="reference"
+              src="index.html?external=1"
+              title="Pinned reference frame"
+            ></iframe>
+          </div>
+        </section>
+        <section>
+          <div class="frame-label">
+            <span>CURRENT FRAME</span><span id="current-time">6.00 s</span>
+          </div>
+          <div class="viewport">
+            <iframe
+              id="current"
+              src="index.html?external=1"
+              title="Current animation frame"
+            ></iframe>
+          </div>
+        </section>
+      </div>
+      <footer>
+        <span id="status" role="status">Loading motion engines…</span>
+        <p>
+          Arrow keys step at 24 fps. The portfolio supports ?t=6.5, ?external=1,
+          and window.anim.seek(t). “Check loop seam” sets the left frame to 0
+          and the right frame to 12.
+        </p>
+      </footer>
+    </main>
+    <script>
+      const reference = document.querySelector("#reference"),
+        current = document.querySelector("#current");
+      let ready = false;
+      function fit() {
+        document.querySelectorAll(".viewport").forEach((view) => {
+          const scale = view.clientWidth / 1440;
+          view.querySelector("iframe").style.transform = `scale(${scale})`;
+          view.style.height = 1020 * scale + "px";
+        });
+      }
+      new ResizeObserver(fit).observe(document.body);
+      async function waitForFrame(frame) {
+        await new Promise((resolve) => {
+          if (
+            frame.contentDocument?.readyState === "complete" &&
+            frame.contentWindow.anim
+          )
+            resolve();
+          else frame.addEventListener("load", resolve, { once: true });
+        });
+        await new Promise((resolve) => {
+          const doc = frame.contentDocument;
+          if (doc.documentElement.dataset.ready === "1") {
+            resolve();
+            return;
+          }
+          const observer = new MutationObserver(() => {
+            if (doc.documentElement.dataset.ready === "1") {
+              observer.disconnect();
+              resolve();
+            }
+          });
+          observer.observe(doc.documentElement, {
+            attributes: true,
+            attributeFilter: ["data-ready"],
+          });
+        });
+      }
+      Promise.all([waitForFrame(reference), waitForFrame(current)]).then(() => {
+        ready = true;
+        document
+          .querySelectorAll("button")
+          .forEach((button) => (button.disabled = false));
+        reference.contentWindow.anim.seek(0);
+        seek(6);
+        document.querySelector("#status").textContent =
+          "Ready. Scrub, pin a moment, or inspect the seam.";
+        fit();
+      });
+      function seek(t) {
+        if (!ready) return;
+        const time = Math.max(0, Math.min(12, t));
+        current.contentWindow.anim.seek(time);
+        document.querySelector("#scrub").value = time;
+        document.querySelector("#time").value = time.toFixed(2) + " s";
+        document.querySelector("#current-time").textContent =
+          time.toFixed(2) + " s";
+      }
+      document
+        .querySelector("#scrub")
+        .addEventListener("input", (event) => seek(Number(event.target.value)));
+      document.querySelector("#pin").addEventListener("click", () => {
+        const t = Number(document.querySelector("#scrub").value);
+        reference.contentWindow.anim.seek(t);
+        document.querySelector("#reference-time").textContent =
+          t.toFixed(2) + " s";
+      });
+      function step(direction) {
+        seek(Number(document.querySelector("#scrub").value) + direction / 24);
+      }
+      document
+        .querySelector("#previous")
+        .addEventListener("click", () => step(-1));
+      document.querySelector("#next").addEventListener("click", () => step(1));
+      document.addEventListener("keydown", (event) => {
+        if (event.target instanceof HTMLInputElement) return;
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+          event.preventDefault();
+          step(event.key === "ArrowLeft" ? -1 : 1);
+        }
+      });
+      document.querySelector("#seam").addEventListener("click", () => {
+        reference.contentWindow.anim.seek(0);
+        document.querySelector("#reference-time").textContent = "0.00 s";
+        seek(12);
+        document.querySelector("#status").textContent =
+          "Loop seam: opening (0s) beside closing (12s). These frames should match exactly.";
+      });
+    </script>
+  </body>
+</html>

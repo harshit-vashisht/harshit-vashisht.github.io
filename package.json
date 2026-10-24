@@ -1,0 +1,53 @@
+{
+  "name": "harshit-workbench",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An interactive developer workbench built with React and TypeScript",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && vite build && vite build --ssr src/entry-server.tsx --outDir .prerender && node scripts/prerender.mjs && node scripts/check-seo.mjs",
+    "preview": "vite preview --host 0.0.0.0 --port 3001 --strictPort",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run",
+    "format": "prettier --write src index.html public/compare.html *.json *.ts",
+    "format:check": "prettier --check src index.html public/compare.html *.json *.ts",
+    "check": "npm run typecheck && npm run test:unit && npm run format:check",
+    "test:e2e": "npm run build && playwright test",
+    "test:dev": "TEST_DEV=1 playwright test",
+    "seo:notify": "node scripts/notify-indexnow.mjs"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "gsap": "3.15.0",
+    "@gsap/react": "2.1.2"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "vite": "8.3.5",
+    "typescript": "7.0.2",
+    "@playwright/test": "1.64.1",
+    "vitest": "5.0.5",
+    "prettier": "3.9.10"
+  },
+  "author": "harshit-vashisht",
+  "homepage": "https://harshit-vashisht.github.io/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harshit-vashisht/harshit-vashisht.github.io.git"
+  },
+  "keywords": [
+    "developer-portfolio",
+    "react",
+    "typescript",
+    "gsap",
+    "accessible-animation"
+  ]
+}
