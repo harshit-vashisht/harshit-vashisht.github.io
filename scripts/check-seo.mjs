@@ -7,7 +7,7 @@ assert.match(html, /<h1[^>]*>/);
 for (const text of ['construction.', 'Forma', 'Orbit', 'Syntax', 'React', 'TypeScript', 'harshit-vashisht']) assert.ok(html.includes(text), `Missing crawlable content: ${text}`);
 assert.equal((html.match(/rel="canonical"/g) || []).length, 1);
 assert.match(html, new RegExp(`rel="canonical" href="${origin.replaceAll('.', '\\.')}"`));
-assert.match(html, /name="author" content="harshit-vashisht"/);
+assert.match(html, /name="author" content="harshit-vashisht, atulhacks"/);
 assert.match(html, /name="robots" content="index, follow, max-image-preview:large"/);
 for (const field of ['og:title', 'og:description', 'og:url', 'og:image', 'og:image:alt']) assert.ok(html.includes(`property="${field}"`));
 const schema = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);

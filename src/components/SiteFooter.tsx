@@ -2,7 +2,8 @@ export function SiteFooter() {
   return (
     <footer>
       <span className="mono">
-        Harshit * · Still figuring things out. Still making things.
+        harshit-vashisht · Created by{" "}
+        <a href="https://github.com/atulhacks">atulhacks</a>
       </span>
       <div className="footer-right mono">
         <a href="https://github.com/harshit-vashisht" rel="me">

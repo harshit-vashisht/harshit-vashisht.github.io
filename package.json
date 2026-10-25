@@ -49,5 +49,11 @@
     "typescript",
     "gsap",
     "accessible-animation"
+  ],
+  "contributors": [
+    {
+      "name": "atulhacks",
+      "url": "https://github.com/atulhacks"
+    }
   ]
 }
